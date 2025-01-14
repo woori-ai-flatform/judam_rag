@@ -1,7 +1,7 @@
 import os, json, random, openai, re
 from jinja2 import Template
 
-api_key = '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'
+api_key = 'apikey'
 client = openai.OpenAI(api_key=api_key)
 
 def load_from_jsonl(filename):
