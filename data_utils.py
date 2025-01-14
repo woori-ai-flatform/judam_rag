@@ -83,7 +83,7 @@ def gpt_batch_request(filename, client=client):
     print('batch_id : {}'.format(completion.id))
     return completion.id
 
-def gpt_batch_status(id):
+def gpt_batch_status(id, client=client):
     print(client.batches.retrieve(id).status)
     print(client.batches.retrieve(id).request_counts)
 
