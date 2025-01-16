@@ -23,7 +23,7 @@ def load_template(file_path):
 
     return Template(template_content)
 
-def prompt_json(id, inst, prompt, url, model_id='gpt-4o-mini', max_tokens=1000):
+def img_prompt_json(id, inst, prompt, url, model_id='gpt-4o-mini', max_tokens=1000):
     res_json =  {'custom_id': id,
                  'method': 'POST',
                  'url': '/v1/chat/completions',
@@ -35,6 +35,18 @@ def prompt_json(id, inst, prompt, url, model_id='gpt-4o-mini', max_tokens=1000):
                                                     'text': prompt},
                                                    {'type': 'image_url',
                                                     'image_url': {'url': url}}]}],
+                         'max_tokens': max_tokens}}
+    return res_json
+
+def prompt_json(id, inst, prompt, model_id='gpt-4o-mini', max_tokens=1000):
+    res_json =  {'custom_id': id,
+                 'method': 'POST',
+                 'url': '/v1/chat/completions',
+                 'body': {'model': model_id,
+                         'messages': [{'role': 'system',
+                                       'content': inst},
+                                       {'role': 'user',
+                                       'content': prompt}],
                          'max_tokens': max_tokens}}
     return res_json
 
