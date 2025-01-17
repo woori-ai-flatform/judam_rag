@@ -105,6 +105,37 @@ def step_02_prompt_json(qa_data, prompt_path, model_id='gpt-4o', max_tokens=3000
         prompt_data.append(data_dict)
     return prompt_data
 
+def doc_step_01_prompt_json(doc_data, prompt_path, role, task_type, level_lst, few_shot_k=2, model_id='gpt-4o', max_tokens=3000):
+    sys_prompt_template = load_template(prompt_path['sys_prompt_path'])
+    usr_prompt_template = load_template(prompt_path['usr_prompt_path'])
+    few_shot_prompt_template = load_template(prompt_path['few_shot_prompt_path'])
+    few_shot_lst = load_from_jsonl(prompt_path['few_shot_lst_path'])
+
+    prompt_data = []
+    n = 0
+    for context in doc_data:
+        for lv, level in level_lst:
+            few_shot = '\n\n'.join(random.sample(few_shot_lst, k=few_shot_k))
+            few_shot_prompt = few_shot_prompt_template.render(few_shot_sample=few_shot)
+            sys_prompt = sys_prompt_template.render(few_shot=few_shot_prompt, role=role, task_type=task_type, level=level)
+            usr_prompt = usr_prompt_template.render(n_datasets=5, context=context)
+            data_dict = {
+                'custom_id': 'doc_qa_{}'.format(n),
+                'method': 'POST',
+                'url': '/v1/chat/completions',
+                'body': {'model': model_id,
+                        'messages': [{'role': 'system',
+                                      'content': sys_prompt},
+                                      {'role': 'user',
+                                      'content': usr_prompt}],
+                        'max_tokens': max_tokens}
+            }
+            prompt_data.append(data_dict)
+            n += 1
+    return prompt_data
+
+
+
 def gpt_batch_request(filename, client=client):
     batch_input_file = client.files.create(
         file=open(filename, "rb"),
